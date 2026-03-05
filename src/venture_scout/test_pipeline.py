@@ -1,5 +1,6 @@
 from .scraper import scrape_website
 from .ai_analyzer import analyze_startup_text
+from .database import insert_deal
 
 def run_full_analysis(url: str):
     
@@ -33,6 +34,12 @@ def run_full_analysis(url: str):
     print(f"Bull Case: {ai_result['bull_case']}")
     print(f"Bear Case: {ai_result['bear_case']}")
     print("--------------------------------\n")
+
+    print("Saving to database...")
+    placeholder_logo = f"https://logo.clearbit.com/{url.replace('https://', '').replace('http://', '').split('/')[0]}"
+
+    insert_deal(company_title, url, ai_result, placeholder_logo)
+
 
 if __name__ == "__main__":
     test_url = "https://vercel.com"
