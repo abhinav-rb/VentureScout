@@ -5,6 +5,8 @@ description = "Venture Scout"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "flask>=3.0",
+    "flask-cors>=4.0",
     "requests>=2.31",
     "beautifulsoup4>=4.12",
     "openai>=1.0",
