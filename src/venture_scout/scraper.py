@@ -20,11 +20,18 @@ def scrape_website(url: str) -> dict:
         title = soup.title.string if soup.title else "Untitled"
         meta_description = soup.find("meta", attrs={"name": "description"})
         description = meta_description["content"] if meta_description else "No description found"
+
+        # Remove non-visible elements before extracting text
+        for tag in soup(["script", "style", "nav", "footer", "header"]):
+            tag.decompose()
+        content = soup.get_text(separator=" ", strip=True)
+
         return {
             "success": True,
             "url": url,
             "title": title,
             "description": description,
+            "content": content[:5000],  # Cap length to avoid huge OpenAI payloads
         }
     except Exception as e:
         return {
