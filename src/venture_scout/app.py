@@ -87,8 +87,8 @@ def update_deal_status(deal_id):
 
 if __name__ == '__main__':
     # Run the app on port 5000 with debug mode enabled so it auto-reloads if we change code
-    print("Starting VentureScout Backend API on http://localhost:5000")
-    app.run(debug=True, port=5000)
+    print("Starting VentureScout Backend API on http://localhost:5001")
+    app.run(debug=True, port=5001, host='0.0.0.0')
 
 
 
