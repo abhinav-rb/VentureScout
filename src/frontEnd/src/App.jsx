@@ -14,7 +14,7 @@ function App() {
   const [selectedDeal, setSelectedDeal] = useState(null)
 
   const fetchDeals = () => {
-    fetch('http://localhost:5000/api/deals')
+    fetch('/api/deals')
       .then(response => {
         if (!response.ok) throw new Error('Failed to connect to backend')
         return response.json()
@@ -49,7 +49,7 @@ function App() {
     setError(null)
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze', {
+      const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: urlInput }),
@@ -93,7 +93,7 @@ function App() {
 
     // Tell the backend to update the database
     try {
-      await fetch(`http://localhost:5000/api/deals/${dealId}`, {
+      await fetch(`/api/deals/${dealId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
