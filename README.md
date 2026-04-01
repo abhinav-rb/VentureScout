@@ -16,6 +16,18 @@ VentureScout is a full-stack tool that automates the early-stage deal screening 
 - **Auto logos** — fetches company logos via Clearbit with Google Favicon fallback
 - **Persistent storage** — all deals saved to SQLite
 
+### Security
+
+- **API key authentication** — all endpoints gated by `X-API-Key` header (configurable via `VS_API_KEY`)
+- **Rate limiting** — 60 req/min globally, 10 req/min on `/api/analyze` (via flask-limiter)
+- **SSRF prevention** — URL validation blocks internal/private IPs, non-HTTP schemes, and unresolvable hostnames
+- **CORS restriction** — configurable allowed origins (defaults to `http://localhost:5173`)
+- **Status validation** — `PATCH /api/deals/:id` only accepts valid pipeline statuses
+- **Prompt-injection mitigation** — scraped text is sanitized before being sent to OpenAI
+- **Response size limits** — scraper enforces a 2 MB download cap
+- **Generic error responses** — internal details are logged server-side, never leaked to clients
+- **Safe defaults** — debug mode off, binds to `127.0.0.1`
+
 ## Tech Stack
 
 - **Frontend:** React (Vite) + Tailwind CSS v4
@@ -32,7 +44,8 @@ src/
 │   ├── app.py              # API routes & server entry point
 │   ├── scraper.py          # Website scraping logic
 │   ├── ai_analyzer.py      # OpenAI integration & Pydantic model
-│   └── database.py         # SQLite schema & queries
+│   ├── database.py         # SQLite schema & queries
+│   └── security.py         # Auth, URL validation, rate limiting, sanitization
 └── frontEnd/               # React frontend
     └── src/
         ├── App.jsx          # Main app (Kanban board, modal, fetch logic)
@@ -78,6 +91,16 @@ source .venv/bin/activate
 python src/venture_scout/app.py
 ```
 
+Optional environment variables:
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `VS_API_KEY` | API authentication key (unset = auth disabled) | — |
+| `VS_CORS_ORIGINS` | Comma-separated allowed CORS origins | `http://localhost:5173` |
+| `FLASK_DEBUG` | Set to `1` to enable debug mode | `0` |
+| `VS_HOST` | Server bind address | `127.0.0.1` |
+| `VS_PORT` | Server port | `5001` |
+
 **Tab 2 — Start the Vite dev server (port 5173):**
 
 ```bash
@@ -90,9 +113,11 @@ The Vite dev server proxies all `/api` requests to the Flask backend automatical
 
 ## API Endpoints
 
-- `POST /api/analyze` — submit a startup URL for AI analysis
+All endpoints require an `X-API-Key` header when `VS_API_KEY` is set.
+
+- `POST /api/analyze` — submit a startup URL for AI analysis (rate-limited: 10/min)
 - `GET /api/deals` — list all tracked deals
-- `PATCH /api/deals/:id` — update a deal's status (e.g. drag to a new column)
+- `PATCH /api/deals/:id` — update a deal's status (valid: New, Outreach, Due Diligence, Pass, Invest)
 
 ## License
 
